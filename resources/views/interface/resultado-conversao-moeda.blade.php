@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultado da Conversão de Moeda</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -33,6 +34,7 @@
     </div>
     <div class="container mt-5">
         <h1 class="mb-4">Resultado Conversão</h1>
+        {{-- <a href="{{ route('enviar-cotacao-email') }}" class="btn btn-success mt-3">Enviar Cotação por Email</a> --}}
         <table class="table">
             <thead>
                 <tr>
@@ -55,6 +57,7 @@
         </table>
         <a href="{{ route('conversao-moeda') }}" class="btn btn-primary mt-3">Voltar</a>
         <a href="{{ route('listar-cotacoes') }}" class="btn btn-dark mt-3">Listar Cotações Realizadas</a>
+
 
     </div>
 </body>

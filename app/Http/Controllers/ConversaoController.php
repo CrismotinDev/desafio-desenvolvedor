@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CotacaoEmail;
 use App\Services\ApiConversaoValores\ConversaoValoresService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ConversaoController extends Controller
 {
@@ -36,6 +38,9 @@ class ConversaoController extends Controller
         $valorTotalMoedaDestino = $valorTotalSemTaxas / $valorMoedaDestino;
         $valorUtilizadoDescontandoTaxas = $valorCompra - $taxaConversao - $taxaPagamento;
 
+        if ($valorCompra < 1000 || $valorCompra > 100000) {
+            return redirect()->back()->withInput()->withErrors(['valorCompra' => 'O valor da compra deve estar entre R$ 1.000,00 e R$ 100.000,00.']);
+        }
         $cotacao = [
             'moedaDestino' => $moedaDestino,
             'valorCompra' => $valorCompra,
@@ -80,5 +85,24 @@ class ConversaoController extends Controller
         }
 
         return redirect()->route('listar-cotacoes')->with('success', 'Cotação excluída com sucesso!');
+    }
+
+    public function enviarCotacaoEmail(Request $request)
+    {
+        $valorMoedaDestino = $request->input('valorMoedaDestino');
+        $valorTotalMoedaDestino = $request->input('valorTotalMoedaDestino');
+        $taxaPagamento = $request->input('taxaPagamento');
+        $taxaConversao = $request->input('taxaConversao');
+        $valorUtilizadoDescontandoTaxas = $request->input('valorUtilizadoDescontandoTaxas');
+
+        Mail::to('destinatario@example.com')->send(new CotacaoEmail(
+            $valorMoedaDestino,
+            $valorTotalMoedaDestino,
+            $taxaPagamento,
+            $taxaConversao,
+            $valorUtilizadoDescontandoTaxas
+        ));
+
+        return redirect()->route('conversao-moeda')->with('success', 'Cotação enviada por e-mail com sucesso.');
     }
 }

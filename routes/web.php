@@ -14,3 +14,4 @@ Route::post('/cotacao-moeda', [ConversaoController::class, 'resultadoCotacao'])-
 Route::get('/resultado-conversao-moeda', [ConversaoController::class, 'tabelaExibindoResultadoCotacao'])->name('tabela-cotacao-moeda');
 Route::get('/listar-cotacoes', [ConversaoController::class, 'listarCotacoes'])->name('listar-cotacoes');
 Route::delete('/excluir-cotacao/{index}', [ConversaoController::class, 'excluirCotacao'])->name('excluir-cotacao');
+Route::get('/enviar-cotacao-email', [ConversaoController::class, 'enviarCotacaoEmail'])->name('enviar-cotacao-email');

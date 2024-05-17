@@ -10,6 +10,15 @@
 
 <body>
     <div class="container mt-5">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <a href="{{ route('listar-cotacoes') }}" class="btn btn-dark mt-3">Listar Cotações Realizadas</a>
         <h1 class="mb-4">Conversor de Moedas</h1>
         <form action="{{ route('cotacao-moeda') }}" method="POST">
@@ -30,7 +39,7 @@
             </div>
             <div class="mb-3">
                 <label for="valorCompra" class="form-label">Valor da Compra em BRL</label>
-                <input type="text" class="form-control" id="valorCompra" name="valorCompra" placeholder="0,00">
+                <input type="text" class="form-control" id="valorCompra" name="valorCompra" value="1.000.00">
                 <div id="valorCompraHelp" class="form-text">O valor deve ser maior que R$ 1.000,00 e menor que R$
                     100.000,00.</div>
             </div>
