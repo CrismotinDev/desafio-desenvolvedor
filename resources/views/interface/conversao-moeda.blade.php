@@ -10,8 +10,11 @@
 
 <body>
     <div class="container mt-5">
+        <a href="{{ route('listar-cotacoes') }}" class="btn btn-dark mt-3">Listar Cotações Realizadas</a>
         <h1 class="mb-4">Conversor de Moedas</h1>
-        <form action="caminho/do/controlador" method="POST">
+        <form action="{{ route('cotacao-moeda') }}" method="POST">
+            @csrf
+            <input type="hidden" name="_method" value="POST">
             <div class="mb-3">
                 <label for="moedaOrigem" class="form-label">Moeda de Origem</label>
                 <select class="form-select" id="moedaOrigem" name="moedaOrigem" disabled>
@@ -41,16 +44,13 @@
             </div>
             <button type="submit" class="btn btn-primary">Converter</button>
         </form>
+
     </div>
 </body>
 
 </html>
-
-
 <script>
     var valorCompraInput = document.getElementById('valorCompra');
-
-
     valorCompraInput.addEventListener('input', function() {
         var valor = valorCompraInput.value;
         valor = valor.replace(/\D/g, '');

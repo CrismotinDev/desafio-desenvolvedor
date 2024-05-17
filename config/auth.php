@@ -40,8 +40,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-    ],
 
+        'custom' => [
+            'driver' => 'session',
+            'provider' => 'custom',
+        ],
+    ],
     /*
     |--------------------------------------------------------------------------
     | User Providers
@@ -65,12 +69,10 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'custom' => [
+            'driver' => 'custom-provider',
+        ],
     ],
-
     /*
     |--------------------------------------------------------------------------
     | Resetting Passwords

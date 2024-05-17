@@ -1,25 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
-Route::get('/', function () {
-    return view('conversao-moeda');
-});
+use App\Http\Controllers\ConversaoController;
+use App\Http\Controllers\LoginController;
 
 
 
-// Route::get('/conversao-moeda', [ConversaoController::class, 'calcularTotal'])->name('conversao-moeda');
+Route::get('/', [LoginController::class, 'formLogin'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login');
 
-
-// Route::get('/resultado', 'ConversaoController@exibirResultado')->name('resultado');
+Route::get('/formulario-conversao-moeda', [ConversaoController::class, 'formCotacao'])->name('conversao-moeda');
+Route::post('/cotacao-moeda', [ConversaoController::class, 'resultadoCotacao'])->name('cotacao-moeda');
+Route::get('/resultado-conversao-moeda', [ConversaoController::class, 'tabelaExibindoResultadoCotacao'])->name('tabela-cotacao-moeda');
+Route::get('/listar-cotacoes', [ConversaoController::class, 'listarCotacoes'])->name('listar-cotacoes');
+Route::delete('/excluir-cotacao/{index}', [ConversaoController::class, 'excluirCotacao'])->name('excluir-cotacao');

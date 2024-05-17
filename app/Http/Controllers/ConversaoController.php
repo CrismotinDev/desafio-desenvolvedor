@@ -13,45 +13,72 @@ class ConversaoController extends Controller
     {
         $this->conversaoValoresService = $conversaoValoresService;
     }
-    public function calcularTotal(Request $request)
+
+    public function formCotacao(Request $request)
     {
+        if ($request->filled(['valorCompra', 'moedaDestino', 'formaPagamento'])) {
+            return redirect()->route('tabela-cotacao-moeda', []);
+        }
 
-        $request->validate([
-            'valorCompra' => 'required|numeric|min:1000|max:100000',
-            'moedaDestino' => 'required|in:USD',
-            'formaPagamento' => 'required|in:boleto,cartao',
-        ]);
+        return view('interface.conversao-moeda');
+    }
 
+    public function resultadoCotacao(Request $request)
+    {
         $valorCompra = $request->input('valorCompra');
-        $moedaDestino = $request->input('moedaDestino');
         $formaPagamento = $request->input('formaPagamento');
-        $moedaOrigem = $request->input('moedaOrigem');
-
-        $valorMoedaDestino = $this->conversaoValoresService->obterValorMoedaDestino($moedaOrigem, $moedaDestino);
-
+        $moedaDestino = $request->input('moedaDestino');
+        $valorCompra = str_replace(',', '.', str_replace('.', '', $valorCompra));
+        $valorMoedaDestino = $this->conversaoValoresService->obterValorMoedaDestino($moedaDestino);
         $taxaConversao = $valorCompra * ($valorCompra < 3000 ? 0.02 : 0.01);
+        $taxaPagamento = ($formaPagamento === 'boleto') ? $valorCompra * 0.0145 : $valorCompra * 0.0763;
+        $valorTotalSemTaxas = $valorCompra - $taxaConversao;
+        $valorTotalMoedaDestino = $valorTotalSemTaxas / $valorMoedaDestino;
+        $valorUtilizadoDescontandoTaxas = $valorCompra - $taxaConversao - $taxaPagamento;
 
-
-        $taxaPagamento = ($formaPagamento === 'boleto' ? $valorCompra * 0.0145 : $valorCompra * 0.0763);
-
-
-        $valorTotal = $valorCompra + $taxaConversao + $taxaPagamento;
-        $valorMoedaDestino = 5.30;
-        $valorCompradoMoedaDestino = $valorTotal / $valorMoedaDestino;
-        $valorUtilizadoConversao = $valorCompra - $taxaConversao;
-        $taxaPagamentoReal = $taxaPagamento * $valorMoedaDestino;
-        $taxaConversaoReal = $taxaConversao * $valorMoedaDestino;
-
-        return view('interface.conversao-moeda', [
-            'moedaOrigem' => 'BRL',
+        $cotacao = [
             'moedaDestino' => $moedaDestino,
             'valorCompra' => $valorCompra,
             'formaPagamento' => $formaPagamento,
             'valorMoedaDestino' => $valorMoedaDestino,
-            'valorCompradoMoedaDestino' => $valorCompradoMoedaDestino,
-            'taxaPagamento' => $taxaPagamentoReal,
-            'taxaConversao' => $taxaConversaoReal,
-            'valorUtilizadoConversao' => $valorUtilizadoConversao,
-        ]);
+            'valorTotalMoedaDestino' => $valorTotalMoedaDestino,
+            'taxaPagamento' => $taxaPagamento,
+            'taxaConversao' => $taxaConversao,
+            'valorUtilizadoDescontandoTaxas' => $valorUtilizadoDescontandoTaxas,
+            'data' => now(),
+        ];
+
+        $cotacoes = session('cotacoes', []);
+        $cotacoes[] = $cotacao;
+        session(['cotacoes' => $cotacoes]);
+
+        return view('interface.resultado-conversao-moeda', compact(
+            'valorCompra',
+            'formaPagamento',
+            'moedaDestino',
+            'valorMoedaDestino',
+            'valorTotalMoedaDestino',
+            'taxaPagamento',
+            'taxaConversao',
+            'valorUtilizadoDescontandoTaxas'
+        ));
+    }
+
+    public function listarCotacoes()
+    {
+        $cotacoes = session('cotacoes', []);
+        return view('interface.lista-cotacoes', compact('cotacoes'));
+    }
+
+    public function excluirCotacao($index)
+    {
+        $cotacoes = session('cotacoes', []);
+
+        if (isset($cotacoes[$index])) {
+            unset($cotacoes[$index]);
+            session(['cotacoes' => array_values($cotacoes)]);
+        }
+
+        return redirect()->route('listar-cotacoes')->with('success', 'Cotação excluída com sucesso!');
     }
 }
